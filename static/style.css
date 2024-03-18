@@ -1,0 +1,32 @@
+/* Custom styles for the Blog Website */
+
+.c-item {
+	height: 480px;
+}
+
+.c-img {
+	height: 100%;
+	object-fit: cover;
+	filter: brightness(0.6);
+}
+
+.card-img-top {
+    width: 100%; /* Make the image fill the container */
+    height: 150px; /* Set the desired height for the card images */
+    object-fit: cover; /* Maintain aspect ratio and cover the entire container */
+}
+
+.house-image {
+	height: 150px;
+	border-radius: 5px;
+}
+
+.house-image:hover {
+	transform: scale(1.05);
+	transition: transform 0.3s ease;
+}
+
+.card-body {
+	padding: 1rem;
+}
+

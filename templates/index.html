@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<!-- Required meta tags -->
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	<!-- CSS Style sheet-->
+	<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+
+	<!-- Bootstrap CSS -->
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css"
+		integrity="sha384-Smlep5jCw/wG7hdkwQ/Z5nLIefveQRIY9nfy6xoR1uRYBtpZgI6339F5dgvm/e9B" crossorigin="anonymous">
+
+	<title>Haldia Rentals</title>
+</head>
+
+<body>
+	<!--The Header-->
+	<header>
+
+		<nav class="navbar navbar-dark bg-dark box-shadow">
+			<div class="container d-flex justify-content-between">
+				<a href="/" class="navbar-brand d-flex align-items-center">
+					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+						class="bi bi-house-door mr-2" stroke-width="2" viewBox="0 0 16 16">
+						<path
+							d="M8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 1.5 7.5v7a.5.5 0 0 0 .5.5h4.5a.5.5 0 0 0 .5-.5v-4h2v4a.5.5 0 0 0 .5.5H14a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.146-.354L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.354 1.146zM2.5 14V7.707l5.5-5.5 5.5 5.5V14H10v-4a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v4H2.5z">
+						</path>
+					</svg>
+					<strong>Haldia Rentals</strong>
+				</a>
+				<div class="d-flex align-items-center">
+					<a href="/" class="text-white mr-3">Home</a>
+					<a href="/about" class="text-white mr-3">About</a>
+					<a href="/contact" class="text-white mr-3">Contact</a>
+				</div>
+			</div>
+		</nav>
+
+	</header>
+
+	<!--Main Part Of the Code-->
+	<main role="main">
+
+		<section class="jumbotron text-center">
+			<div class="container">
+				<!-- Carousel Section -->
+				<div id="carouselExample" class="carousel slide" data-ride="carousel">
+					<ol class="carousel-indicators">
+						<!-- Dynamically generate indicators -->
+						{% for image in carousel_images %}
+						<li data-target="#carouselExampleIndicators" data-slide-to="{{ loop.index0 }}"
+							class="{% if loop.first %}active{% endif %}"></li>
+						{% endfor %}
+					</ol>
+					<div class="carousel-inner">
+						<!-- Dynamically generate carousel items -->
+						{% for image in carousel_images %}
+						<div class="carousel-item {% if loop.first %}active{% endif %} c-item">
+							<img src="{{ image }}" class="d-block w-100 img-fluid c-img" alt="Slide {{ loop.index }}">
+						</div>
+						{% endfor %}
+					</div>
+					<a class="carousel-control-prev" href="#carouselExample" role="button" data-slide="prev">
+						<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+						<span class="sr-only">Previous</span>
+					</a>
+					<a class="carousel-control-next" href="#carouselExample" role="button" data-slide="next">
+						<span class="carousel-control-next-icon" aria-hidden="true"></span>
+						<span class="sr-only">Next</span>
+					</a>
+				</div>
+				<!-- End Carousel -->
+			</div>
+		</section>
+
+		<!--Album Of Houses Section Starts Here-->
+		<div class="album py-5 bg-light">
+			<div class="container">
+
+				<div class="row">
+					<!-- Loop through cards data and generate cards -->
+					{% for card in cards %}
+					<!-- Card Section -->
+					<div class="col-md-4">
+						<div class="card mb-4 box-shadow">
+							<img class="card-img-top" src="{{ card.image }}"
+								data-src="holder.js/100px225?theme=thumb&bg=55595c&fg=eceeef&text=Thumbnail"
+								alt="Card image cap">
+							<div class="card-body">
+								<p class="card-text">{{ card.description }}</p>
+								<div class="d-flex justify-content-between align-items-center">
+									<div class="btn-group">
+										<button id="viewButton" type="button" class="btn btn-sm btn-outline-secondary"
+											data-toggle="modal" data-target="#houseModal{{ loop.index }}">View</button>
+									</div>
+									<small class="text-muted">{{ card.add_date }}</small>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- Modal -->
+					<div class="modal fade" id="houseModal{{ loop.index }}" tabindex="-1" role="dialog"
+						aria-labelledby="houseModalLabel" aria-hidden="true">
+						<div class="modal-dialog modal-lg" role="document">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h5 class="modal-title" id="houseModalLabel">House Details</h5>
+									<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+										<span aria-hidden="true">&times;</span>
+									</button>
+								</div>
+								<div class="modal-body">
+									<!-- House images -->
+									<div class="row">
+										<!-- Display images in a grid -->
+										<div class="col-md-4 mb-3">
+											<img src="{{ card.image }}" class="img-fluid house-image" alt="House Image">
+										</div>
+									</div>
+									<!-- House details -->
+									<h5 class="mt-3">House Description</h5>
+									<p>{{ card.description }}</p>
+									<ul>
+										<li><strong>Owner Name:</strong> {{ card.owner_name }}</li>
+										<li><strong>Contact Number:</strong> {{ card.contact_number }}</li>
+										<li><strong>Monthly Rent:</strong> {{ card.monthly_rent }}</li>
+										<li><strong>Residence Type:</strong> {{ card.residence_type }}</li>
+										<li><strong>Number of Bathrooms:</strong> {{ card.num_bathrooms }}</li>
+										<li><strong>Attached Kitchen:</strong> {{ card.attached_kitchen }}</li>
+										<li><strong>Available Shopping Mall:</strong> {{ card.shopping_mall }}</li>
+										<li><strong>Total Number of Beds:</strong> {{ card.num_beds }}</li>
+										<li><strong>Transport Facility:</strong> {{ card.transport_facility }}</li>
+										<li><strong>Available Medical Shops:</strong> {{ card.medical_shops }}</li>
+										<li><strong>Total Number of Food Mess:</strong> {{ card.num_food_mess }}</li>
+										<li><strong>Time Spend to Reach Market:</strong> {{ card.time_to_market }}</li>
+										<li><strong>Time Taken to Reach College:</strong> {{ card.time_to_college }}
+										</li>
+										<li><strong>Available Playground:</strong> {{ card.playground }}</li>
+									</ul>
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!--Model Section Ends Here-->
+					{% endfor %}
+				</div>
+			</div>
+		</div>
+
+		<!--Album of Houses Section Ends Here-->
+
+	</main>
+
+	<footer class="text-muted">
+		<div class="container">
+			<p class="float-right">
+				<a href="#">Back to top</a>
+			</p>
+			<p>House Rent Finder: Discover rental properties with ease. Find houses for rent along with owner contact
+				details.</p>
+		</div>
+	</footer>
+
+	<!-- Bootstrap JS and jQuery -->
+	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+		integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+		crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+		integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+		crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+		integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+		crossorigin="anonymous"></script>
+
+</body>
+
+</html>
