@@ -1,9 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for
-import logging
-app = Flask(__name__)
 
-# Set the log level to DEBUG
-app.logger.setLevel(logging.DEBUG)
+app = Flask(__name__)
 
 
 carousel_images = [
@@ -73,15 +70,14 @@ card_data = [
 ]
 
 
-
 @app.route('/submit_contact_form', methods=['POST'])
 def submit_contact_form():
     if request.method == 'POST':
         try:
             # Retrieve form data
-            name = request.form['name']
-            email = request.form['email']
-            message = request.form['message']
+            name = request.form.get('name')
+            email = request.form.get('email')
+            message = request.form.get('message')
             
             # Here you can process the form data as needed
             # For now, let's just print the data
