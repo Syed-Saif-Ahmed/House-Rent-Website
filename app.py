@@ -1,7 +1,38 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, jsonify
+from sqlalchemy import create_engine, Column, String, Integer, Text
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+
+
 
 app = Flask(__name__)
 
+# MySQL configurations
+mysql_config = {
+    'host': 'localhost',  # Change this to your MySQL host
+    'user': 'root',  # Change this to your MySQL username
+    'password': 'saif1234',  # Change this to your MySQL password
+    'database': 'rents'  # Change this to your MySQL database name
+}
+
+# SQLAlchemy database setup
+engine = create_engine('mysql+mysqlconnector://{user}:{password}@{host}/{database}'.format(**mysql_config))
+Base = declarative_base()
+
+# Define Contact model
+class Contact(Base):
+    __tablename__ = 'contacts'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(100), nullable=False)
+    email = Column(String(100), nullable=False)
+    message = Column(Text, nullable=False)
+
+# Create the table in the database
+Base.metadata.create_all(engine)
+
+# Create a sessionmaker
+Session = sessionmaker(bind=engine)
 
 carousel_images = [
     'https://is1-2.housingcdn.com/01c16c28/169120c556b55c17c2b73b9a755f5e74/v0/fs/3_bhk_independent_house-for-rent-haldia_riverside_estates_limited-Purba+Medinipur-bedroom.jpg',
@@ -79,12 +110,24 @@ def submit_contact_form():
             email = request.form.get('email')
             message = request.form.get('message')
             
-            # Here you can process the form data as needed
-            # For now, let's just print the data
-            print(f"Name: {name}, Email: {email}, Message: {message}")
-            
+           # Create a new Contact object
+            contact = Contact(name=name, email=email, message=message)
+
+            # Create a session
+            Session = sessionmaker(bind=engine)
+            session = Session()
+
+            # Add the Contact object to the session
+            session.add(contact)
+
+            # Commit the session to save the data to the database
+            session.commit()
+
+            # Close the session
+            session.close()
+
             # Optionally, you can redirect the user to a thank you page
-            return redirect(url_for('thank_you_page'))
+            return render_template('thank_you.html')
         
         except KeyError as e:
             # Handle missing form fields
@@ -92,11 +135,19 @@ def submit_contact_form():
             return render_template('contact.html', error_message="Please fill out all the fields.")
 
 
+# Route for the admin page
+@app.route('/admin')
+def admin_page():
+    # Query the database to retrieve submitted queries
+    # Fetch contacts from the database
+    session = Session()
+    queries = session.query(Contact).all()
+    session.close()
+    return render_template('admin.html', queries=queries)
+
 @app.route('/thank_you_page')
 def thank_you_page():
     return render_template('thank_you.html')
-
-
 
 @app.route('/')
 def index():

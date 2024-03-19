@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Admin Page - Queries</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Admin Page - Queries</h1>
+        <div class="row">
+            <!-- Loop through queries and display them in cards -->
+            {% for query in queries %}
+            <div class="col-md-6">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Name: {{ query.name }}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">Email: {{ query.email }}</h6>
+                        <p class="card-text">Message: {{ query.message }}</p>
+                        <!-- Reply button and input box -->
+                        <button class="btn btn-primary btn-sm reply-btn" data-toggle="modal"
+                            data-target="#replyModal{{ loop.index }}">Reply</button>
+                        <div class="modal fade" id="replyModal{{ loop.index }}" tabindex="-1" role="dialog"
+                            aria-labelledby="replyModalLabel{{ loop.index }}" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="replyModalLabel{{ loop.index }}">Reply to
+                                            {{ query.name }}</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="form-group">
+                                            <label for="replyMessage{{ loop.index }}">Reply Message</label>
+                                            <textarea class="form-control" id="replyMessage{{ loop.index }}"
+                                                rows="3"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        <button type="button" class="btn btn-primary send-reply" data-email="{{ query.email }}"
+                                            data-name="{{ query.name }}">Send</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
+</body>
+
+</html>
