@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify
-from sqlalchemy import create_engine, Column, String, Integer, Text
+from sqlalchemy import create_engine, Column, String, Integer, Text, Date
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
@@ -27,6 +27,31 @@ class Contact(Base):
     name = Column(String(100), nullable=False)
     email = Column(String(100), nullable=False)
     message = Column(Text, nullable=False)
+
+
+# Define the House class
+class House(Base):
+    __tablename__ = 'houses'
+
+    id = Column(String(10), primary_key=True) #ID Of each houses
+    image = Column(String(255)) # Image link
+    description = Column(Text) # Description of the house (It mainly containts the Address of the House)
+    add_date = Column(Date) # When the house has been registered
+    owner_name = Column(String(255)) # Name of the owner
+    contact_number = Column(String(15)) # Contact Number  
+    monthly_rent = Column(Integer) # Monthly Price of the rent 
+    residence_type = Column(String(50)) # Type of room required eg., Single room, Sharing Room , flat etc
+    num_bathrooms = Column(Integer) # Numbeer of bathroom
+    attached_kitchen = Column(String(3)) # It is yes or no answer so we will save 1 or 0
+    shopping_mall = Column(Integer) # It is yes or no answer so we will save 1 or 0
+    num_beds = Column(Integer) # Number of besd in a room
+    transport_facility = Column(Integer) # It is yes or no answer so we will save 1 or 0
+    medical_shops = Column(Integer) # It is yes or no answer so we will save 1 or 0
+    num_food_mess = Column(Integer) # Number of Mess available nearby
+    time_to_market = Column(Integer) # Time taken to reach market on foot 5, 10, 15, 20, ... minutes
+    time_to_college = Column(Integer) # Time taken to reach College on foot 5, 10, 15, 20, ... minutes
+    playground = Column(Integer)# It is yes or no answer so we will save 1 or 0
+
 
 # Create the table in the database
 Base.metadata.create_all(engine)
