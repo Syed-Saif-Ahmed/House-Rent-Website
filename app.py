@@ -45,7 +45,7 @@ class House(Base):
     attached_kitchen = Column(String(3)) # It is yes or no answer so we will save 1 or 0
     shopping_mall = Column(Integer) # It is yes or no answer so we will save 1 or 0
     num_beds = Column(Integer) # Number of besd in a room
-    transport_facility = Column(Integer) # It is yes or no answer so we will save 1 or 0
+    transport_facility = Column(Integer) # It is yes or no answer so we will save 1 or 0x
     medical_shops = Column(Integer) # It is yes or no answer so we will save 1 or 0
     num_food_mess = Column(Integer) # Number of Mess available nearby
     time_to_market = Column(Integer) # Time taken to reach market on foot 5, 10, 15, 20, ... minutes
