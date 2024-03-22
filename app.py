@@ -15,11 +15,12 @@ with open(r'static/secretkey.txt', 'r') as file:
     app.secret_key = content # Add A secret Key Here
 
 # Configure Flask-Mail
-app.config['MAIL_SERVER'] = 'smtp.example.com'
-app.config['MAIL_PORT'] = 587  # or your mail server port
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'your_username@example.com'
-app.config['MAIL_PASSWORD'] = 'your_password'
+app.config['MAIL_SERVER'] = 'smtp.fastmail.com'
+app.config['MAIL_PORT'] = '465'  # or your mail server port
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+app.config['MAIL_USERNAME'] = 'rentechspace@fastmail.com'
+app.config['MAIL_PASSWORD'] = 'zkukp4r93fhxzfv6'
 mail = Mail(app)
 
 # MySQL configurations
@@ -40,7 +41,7 @@ class Admin_Table(Base):
 
     ''' 
     First insert the id, user name and password Manually on the data base to access the admin section.
-    
+
     '''
     __tablename__ = 'Admin_table'
     id = Column(Integer, primary_key=True)
@@ -238,7 +239,7 @@ def send_message():
         print(f"name- {name} email- {email} message- {message}")
 
         # Send email
-        msg = Message(subject='Reply to your query', sender='your_email@example.com', recipients=[email])
+        msg = Message(subject='Reply to your query', sender=app.config['MAIL_USERNAME'], recipients=[email])
         msg.body = f"Hello {name},\n\nThank you for your message. We have received your query. \
             \n\n{message}\n\nBest regards,\nAdmin"
         mail.send(msg)
