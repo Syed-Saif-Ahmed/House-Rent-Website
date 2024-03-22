@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify
+from flask import Flask, render_template, request, redirect, url_for, jsonify, session
 from sqlalchemy import create_engine, Column, String, Integer, Text, Date
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -7,6 +7,12 @@ from smtplib import SMTPException
 
 app = Flask(__name__)
 
+# Open the file in read mode ('r')
+with open(r'static/secretkey.txt', 'r') as file:
+    # Read the entire content of the file
+    content = file.read()
+
+    app.secret_key = content # Add A secret Key Here
 
 # Configure Flask-Mail
 app.config['MAIL_SERVER'] = 'smtp.example.com'
@@ -27,6 +33,19 @@ mysql_config = {
 # SQLAlchemy database setup
 engine = create_engine('mysql+mysqlconnector://{user}:{password}@{host}/{database}'.format(**mysql_config))
 Base = declarative_base()
+
+
+# Define Admin model
+class Admin_Table(Base):
+
+    ''' 
+    First insert the id, user name and password Manually on the data base to access the admin section.
+    
+    '''
+    __tablename__ = 'Admin_table'
+    id = Column(Integer, primary_key=True)
+    username = Column(String(20), unique=True, nullable=False)
+    password = Column(String(60), nullable=False)
 
 # Define Contact model
 class Contact(Base):
@@ -174,10 +193,38 @@ def submit_contact_form():
 def admin_page():
     # Query the database to retrieve submitted queries
     # Fetch contacts from the database
-    session = Session()
-    queries = session.query(Contact).all()
-    session.close()
-    return render_template('admin.html', queries=queries)
+    if 'username' in session:
+        session_db = Session()
+        queries = session_db.query(Contact).all()
+        session_db.close()
+        return render_template('admin.html', queries=queries)
+    else:
+        return redirect(url_for('admin_login'))
+
+
+
+@app.route('/admin_login', methods=['GET', 'POST'])
+def admin_login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        session_db = Session()
+        user = session_db.query(Admin_Table).filter_by(username=username).first()
+        session_db.close()
+
+        if user and user.password == password:
+            session['username'] = username  # Store username in session
+            return redirect(url_for('admin_page'))
+        else:
+            return render_template('adminlogin.html', message='Invalid credentials')
+
+    return render_template('adminlogin.html')
+
+@app.route('/admin_logout')
+def admin_logout():
+    session.pop('username', None)  # Remove username from session
+    return redirect(url_for('index'))
 
 
 @app.route('/send_message', methods=['POST'])

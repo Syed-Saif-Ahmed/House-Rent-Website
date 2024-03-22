@@ -38,3 +38,9 @@ document.addEventListener('DOMContentLoaded', function() {
         xhr.send(JSON.stringify({ name: name, email: email, message: message }));
     }
 });
+
+document.getElementById("logoutBtn").addEventListener("click", function() {
+    // Perform logout actions here
+    // For example, redirect to logout endpoint or clear session
+    window.location.href = "/admin_logout";
+});

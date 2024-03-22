@@ -14,6 +14,10 @@
 <body>
     <div class="container mt-5">
         <h1 class="text-center mb-4">Admin Page - Queries</h1>
+        <!-- Logout Button -->
+        <div class="text-right mb-3">
+            <button class="btn btn-danger" id="logoutBtn">Logout</button>
+        </div>
         <div class="row">
             <!-- Loop through queries and display them in cards -->
             {% for query in queries %}
@@ -45,9 +49,12 @@
                                         </div>
                                     </div>
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                        <button type="button" class="btn btn-primary send-reply" data-email="{{ query.email }}"
-                                            data-name="{{ query.name }}" data-toggle="modal" data-target="#replyModal{{ loop.index }}">Send</button>
+                                        <button type="button" class="btn btn-secondary"
+                                            data-dismiss="modal">Close</button>
+                                        <button type="button" class="btn btn-primary send-reply"
+                                            data-email="{{ query.email }}" data-name="{{ query.name }}"
+                                            data-toggle="modal"
+                                            data-target="#replyModal{{ loop.index }}">Send</button>
                                     </div>
                                 </div>
                             </div>
@@ -65,7 +72,7 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    
+
 </body>
 
 </html>
