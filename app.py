@@ -315,7 +315,7 @@ def add_house():
     return render_template('add_house.html', form=form)
 @app.route('/success')
 def success():
-    return 'House added successfully!'
+    return render_template('thank_you.html')
 
 
 if __name__ == '__main__':
