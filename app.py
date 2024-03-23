@@ -31,7 +31,7 @@ mail = Mail(app)
 mysql_config = {
     'host': 'localhost',  # Change this to your MySQL host
     'user': 'root',  # Change this to your MySQL username
-    'password': 'root',  # Change this to your MySQL password
+    'password': 'saif1234',  # Change this to your MySQL password
     'database': 'rents'  # Change this to your MySQL database name
 }
 
@@ -87,6 +87,12 @@ class House(Base):
 
     def __repr__(self):
         return f'<House {self.id}>'
+    
+# Define the CarouselImage model
+class CarouselImage(Base):
+    __tablename__ = 'carousel'
+    id = Column(Integer, primary_key=True)
+    url = Column(String(255))
 
 
 # Create the table in the database
@@ -100,6 +106,18 @@ carousel_images = [
     'https://cf.bstatic.com/xdata/images/hotel/max1024x768/496372177.jpg?k=cf4427eaf1ea929a679d29f61b892eef2e3e55ed5ff8fed3cd1ef6ca0c6bb90b&o=&hp=1',
     'https://cf.bstatic.com/xdata/images/hotel/max1024x768/472220329.jpg?k=f527727b1826834f9c66ae9bd3176ea7a67ca9cd7a32aa1c944c924c3a387928&o=&hp=1'
 ]
+
+try:
+    # Query all rows from the CarouselImage table
+    session_db = Session()
+    queries = session_db.query(CarouselImage).all()
+    session_db.close()
+    carousel = queries
+    # Convert the query result to a list of dictionaries
+    carousel_data = [image.url for image in carousel]
+    carousel_images.extend(carousel_data)
+except Exception as e:
+    print(f"Error extracting data from the database: {e}")
 
 card_data = []
 try:
