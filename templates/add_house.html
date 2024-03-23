@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- CSS Style sheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='footer-section.css') }}">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css"
+        integrity="sha384-Smlep5jCw/wG7hdkwQ/Z5nLIefveQRIY9nfy6xoR1uRYBtpZgI6339F5dgvm/e9B" crossorigin="anonymous">
+
+    <title>Add New House - Haldia Rentals</title>
+</head>
+
+<body>
+    <!-- The Navbar -->
+    <nav class="navbar navbar-dark bg-dark box-shadow">
+        <div class="container d-flex justify-content-between">
+            <a href="/" class="navbar-brand d-flex align-items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                    class="bi bi-house-door mr-2" stroke-width="2" viewBox="0 0 16 16">
+                    <path
+                        d="M8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 1.5 7.5v7a.5.5 0 0 0 .5.5h4.5a.5.5 0 0 0 .5-.5v-4h2v4a.5.5 0 0 0 .5.5H14a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.146-.354L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.354 1.146zM2.5 14V7.707l5.5-5.5 5.5 5.5V14H10v-4a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v4H2.5z">
+                    </path>
+                </svg>
+                <strong>Haldia Rentals</strong>
+            </a>
+            <div class="d-flex align-items-center">
+                <a href="/" class="text-white mr-3">Home</a>
+                <a href="/about" class="text-white mr-3">About</a>
+                <a href="/contact" class="text-white mr-3">Contact</a>
+                <a href="/contact" class="text-white mr-3">List Your House</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+                <h2 class="text-center mb-4">Add New House</h2>
+                <form method="POST" action="{{ url_for('add_house') }}">
+                    {{ form.csrf_token }}
+                    {{ form.hidden_tag() }}
+                    <div class="form-group">
+                        {{ form.image.label(class="form-control-label") }}
+                        {{ form.image(class="form-control") }}
+                        {% for error in form.image.errors %}
+                        <span class="text-danger">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="form-group">
+                        {{ form.description.label(class="form-control-label") }}
+                        {{ form.description(class="form-control") }}
+                        {% for error in form.description.errors %}
+                        <span class="text-danger">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="form-group">
+                        {{ form.owner_name.label(class="form-control-label") }}
+                        {{ form.owner_name(class="form-control") }}
+                        {% for error in form.owner_name.errors %}
+                        <span class="text-danger">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="form-group">
+                        {{ form.contact_number.label(class="form-control-label") }}
+                        {{ form.contact_number(class="form-control") }}
+                        {% for error in form.contact_number.errors %}
+                        <span class="text-danger">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="form-group">
+                        {{ form.monthly_rent.label(class="form-control-label") }}
+                        {{ form.monthly_rent(class="form-control") }}
+                        {% for error in form.monthly_rent.errors %}
+                        <span class="text-danger">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="form-group">
+                        {{ form.residence_type.label(class="form-control-label") }}
+                        {{ form.residence_type(class="form-control") }}
+                        {% for error in form.residence_type.errors %}
+                        <span class="text-danger">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="form-group">
+                        {{ form.num_bathrooms.label(class="form-control-label") }}
+                        {{ form.num_bathrooms(class="form-control") }}
+                        {% for error in form.num_bathrooms.errors %}
+                        <span class="text-danger">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="form-group form-check">
+                        {{ form.attached_kitchen(class="form-check-input") }}
+                        {{ form.attached_kitchen.label(class="form-check-label") }}
+                    </div>
+                    <!-- Add other form fields here -->
+                    <button type="submit" class="btn btn-primary btn-block">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.3>
