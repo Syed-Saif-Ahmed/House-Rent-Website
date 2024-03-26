@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Account</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='user_account_style.css') }}">
+</head>
+
+<body>
+    <div class="container">
+        <!-- User Details -->
+        <div class="card mt-5">
+            <div class="card-header">
+                <h3 class="text-center">User Details</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Name:</strong> {{ user.username }}<button class="btn btn-edit">Edit</button></p>
+                        <p><strong>Email:</strong> {{ user.email }}<button class="btn btn-edit">Edit</button></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add House Button -->
+        <div class="text-center mt-3">
+            <a href="/add_house" class="btn btn-primary">Add House</a>
+        </div>
+
+        <div class="album py-5 bg-light">
+			<div class="container">
+
+				<div class="row">
+					<!-- Loop through cards data and generate cards -->
+					{% for card in cards %}
+					<!-- Card Section -->
+					<div class="col-md-4">
+						<div class="card mb-4 box-shadow">
+							<img class="card-img-top" src="{{ card.image }}"
+								data-src="holder.js/100px225?theme=thumb&bg=55595c&fg=eceeef&text=Thumbnail"
+								alt="Card image cap">
+							<div class="card-body">
+								<p class="card-text">{{ card.description }}</p>
+								<div class="d-flex justify-content-between align-items-center">
+									<div class="btn-group">
+										<button id="viewButton" type="button" class="btn btn-sm btn-outline-secondary"
+											data-toggle="modal" data-target="#houseModal{{ loop.index }}">View</button>
+									</div>
+									<small class="text-muted">{{ card.add_date }}</small>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- Modal -->
+					<div class="modal fade" id="houseModal{{ loop.index }}" tabindex="-1" role="dialog"
+						aria-labelledby="houseModalLabel" aria-hidden="true">
+						<div class="modal-dialog modal-lg" role="document">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h5 class="modal-title" id="houseModalLabel">House Details</h5>
+									<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+										<span aria-hidden="true">&times;</span>
+									</button>
+								</div>
+								<div class="modal-body">
+									<!-- House images -->
+									<div class="row">
+										<!-- Display images in a grid -->
+										<div class="col-md-4 mb-3">
+											<img src="{{ card.image }}" class="img-fluid house-image" alt="House Image">
+										</div>
+									</div>
+									<!-- House details -->
+									<h5 class="mt-3">House Description</h5>
+									<p>{{ card.description }}</p>
+									<ul>
+										<li><strong>Owner Name:</strong> {{ card.owner_name }}</li>
+										<li><strong>Contact Number:</strong> {{ card.contact_number }}</li>
+										<li><strong>Monthly Rent:</strong> {{ card.monthly_rent }}</li>
+										<li><strong>Residence Type:</strong> {{ card.residence_type }}</li>
+										<li><strong>Number of Bathrooms:</strong> {{ card.num_bathrooms }}</li>
+										<li><strong>Attached Kitchen:</strong> {{ card.attached_kitchen }}</li>
+										<li><strong>Available Shopping Mall:</strong> {{ card.shopping_mall }}</li>
+										<li><strong>Total Number of Beds:</strong> {{ card.num_beds }}</li>
+										<li><strong>Transport Facility:</strong> {{ card.transport_facility }}</li>
+										<li><strong>Available Medical Shops:</strong> {{ card.medical_shops }}</li>
+										<li><strong>Total Number of Food Mess:</strong> {{ card.num_food_mess }}</li>
+										<li><strong>Time Spend to Reach Market:</strong> {{ card.time_to_market }}</li>
+										<li><strong>Time Taken to Reach College:</strong> {{ card.time_to_college }}
+										</li>
+										<li><strong>Available Playground:</strong> {{ card.playground }}</li>
+									</ul>
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!--Model Section Ends Here-->
+					{% endfor %}
+				</div>
+			</div>
+		</div>
+        <!-- Logout Button -->
+        <div class="text-center mt-3">
+            <a href="/logout" class="btn btn-danger">Logout</a>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>

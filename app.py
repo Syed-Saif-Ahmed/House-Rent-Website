@@ -52,6 +52,17 @@ class Admin_Table(Base):
     username = Column(String(20), unique=True, nullable=False)
     password = Column(String(60), nullable=False)
 
+
+class User(Base):
+    __tablename__ = 'user'
+    id = Column(Integer, primary_key=True)
+    username = Column(String(50), unique=True, nullable=False)
+    email = Column(String(100), unique=True, nullable=False)
+    password = Column(String(100), nullable=False)
+
+    def __repr__(self):
+        return f'<User {self.username}>'
+    
 # Define Contact model
 class Contact(Base):
     __tablename__ = 'contacts'
@@ -106,52 +117,56 @@ carousel_images = [
     'https://cf.bstatic.com/xdata/images/hotel/max1024x768/496372177.jpg?k=cf4427eaf1ea929a679d29f61b892eef2e3e55ed5ff8fed3cd1ef6ca0c6bb90b&o=&hp=1',
     'https://cf.bstatic.com/xdata/images/hotel/max1024x768/472220329.jpg?k=f527727b1826834f9c66ae9bd3176ea7a67ca9cd7a32aa1c944c924c3a387928&o=&hp=1'
 ]
-
-try:
-    # Query all rows from the CarouselImage table
-    session_db = Session()
-    queries = session_db.query(CarouselImage).all()
-    session_db.close()
-    carousel = queries
-    # Convert the query result to a list of dictionaries
-    carousel_data = [image.url for image in carousel]
-    carousel_images.extend(carousel_data)
-except Exception as e:
-    print(f"Error extracting data from the database: {e}")
+def loadcarousel():
+    try:
+        # Query all rows from the CarouselImage table
+        session_db = Session()
+        queries = session_db.query(CarouselImage).all()
+        session_db.close()
+        carousel = queries
+        # Convert the query result to a list of dictionaries
+        carousel_data = [image.url for image in carousel]
+        carousel_images.extend(carousel_data)
+    except Exception as e:
+        print(f"Error extracting data from the database: {e}")
+loadcarousel()
 
 card_data = []
-try:
-    # Query all rows from the House table
-    session_db = Session()
-    queries = session_db.query(House).all()
-    session_db.close()
-    houses = queries
-    # Convert the query result to the desired format
-    formatted_data = [
-        {
-            'image': house.image,
-            'description': house.description,
-            'add_date': house.add_date,
-            'owner_name': house.owner_name,
-            'contact_number': house.contact_number,
-            'monthly_rent': house.monthly_rent,
-            'residence_type': house.residence_type,
-            'num_bathrooms': house.num_bathrooms,
-            'attached_kitchen': house.attached_kitchen,
-            'shopping_mall': house.shopping_mall,
-            'num_beds': house.num_beds,
-            'transport_facility': house.transport_facility,
-            'medical_shops': house.medical_shops,
-            'num_food_mess': house.num_food_mess,
-            'time_to_market': house.time_to_market,
-            'time_to_college': house.time_to_college,
-            'playground': house.playground
-        }
-        for house in houses
-    ]
-    card_data.extend(formatted_data)
-except Exception as e:
-    print(f"Error extracting data from the database: {e}")
+def houseload():
+    try:
+        # Query all rows from the House table
+        session_db = Session()
+        queries = session_db.query(House).all()
+        session_db.close()
+        houses = queries
+        # Convert the query result to the desired format
+        formatted_data = [
+            {
+                'image': house.image,
+                'description': house.description,
+                'add_date': house.add_date,
+                'owner_name': house.owner_name,
+                'contact_number': house.contact_number,
+                'monthly_rent': house.monthly_rent,
+                'residence_type': house.residence_type,
+                'num_bathrooms': house.num_bathrooms,
+                'attached_kitchen': house.attached_kitchen,
+                'shopping_mall': house.shopping_mall,
+                'num_beds': house.num_beds,
+                'transport_facility': house.transport_facility,
+                'medical_shops': house.medical_shops,
+                'num_food_mess': house.num_food_mess,
+                'time_to_market': house.time_to_market,
+                'time_to_college': house.time_to_college,
+                'playground': house.playground
+            }
+            for house in houses
+        ]
+        card_data.extend(formatted_data)
+    except Exception as e:
+        print(f"Error extracting data from the database: {e}")
+
+houseload()
 
 class HouseForm(FlaskForm):
     image = StringField('Image Link', validators=[DataRequired()])
@@ -247,24 +262,55 @@ def admin_logout():
 
 @app.route('/send_message', methods=['POST'])
 def send_message():
-    try:
-        data = request.json
-        name = data.get('name')
-        email = data.get('email')
-        message = data.get('message')
+    if 'username' in session:
+        try:
+            data = request.json
+            name = data.get('name')
+            email = data.get('email')
+            message = data.get('message')
 
-        print(f"name- {name} email- {email} message- {message}")
+            print(f"name- {name} email- {email} message- {message}")
 
-        # Send email
-        msg = Message(subject='Reply to your query', sender=app.config['MAIL_USERNAME'], recipients=[email])
-        msg.body = f"Hello {name},\n\nThank you for your message. We have received your query. \
-            \n\n{message}\n\nBest regards,\nAdmin"
-        mail.send(msg)
+            # Send email
+            msg = Message(subject='Reply to your query', sender=app.config['MAIL_USERNAME'], recipients=[email])
+            msg.body = f"Hello {name},\n\nThank you for your message. We have received your query. \
+                \n\n{message}\n\nBest regards,\nAdmin"
+            mail.send(msg)
 
-        return jsonify({'success': True})
+            return jsonify({'success': True})
 
-    except SMTPException as e:
-        return jsonify({'success': False, 'error': str(e)})
+        except SMTPException as e:
+            return jsonify({'success': False, 'error': str(e)})
+    else:
+        return redirect(url_for('admin_login'))
+    
+@app.route('/add_image', methods=['POST'])
+def add_image():
+    if 'username' in session:
+        image_url = request.form.get('imageUrl')
+        if image_url:
+            # Create a new Contact object
+            input = CarouselImage(url=image_url)
+
+            # Create a session
+            Session = sessionmaker(bind=engine)
+            session = Session()
+
+            # Add the Contact object to the session
+            session.add(input)
+
+            # Commit the session to save the data to the database
+            session.commit()
+
+            # Close the session
+            session.close()
+            #carousel_images.append({'url': image_url})
+
+            return jsonify({'message': 'Image added successfully'}), 200, loadcarousel()
+        else:
+            return jsonify({'error': 'No image URL provided'}), 400
+    else:
+        return redirect(url_for('admin_login'))
 
 @app.route('/thank_you_page')
 def thank_you_page():
@@ -282,37 +328,133 @@ def contact():
 def about():
     return render_template('about.html')
 
-@app.route('/add_house', methods=['GET', 'POST'])
-def add_house():
-    form = HouseForm()
-    if form.validate_on_submit():
-        new_house = House(
-            id = random.randint(1,100),
-            image=form.image.data,
-            description=form.description.data,
-            add_date=form.add_date.data,
-            owner_name=form.owner_name.data,
-            contact_number=form.contact_number.data,
-            monthly_rent=form.monthly_rent.data,
-            residence_type=form.residence_type.data,
-            num_bathrooms=form.num_bathrooms.data,
-            attached_kitchen=form.attached_kitchen.data,
-            shopping_mall=form.shopping_mall.data,
-            num_beds=form.num_beds.data,
-            transport_facility=form.transport_facility.data,
-            medical_shops=form.medical_shops.data,
-            num_food_mess=form.num_food_mess.data,
-            time_to_market=form.time_to_market.data,
-            time_to_college=form.time_to_college.data,
-            playground=form.playground.data
-        )
+# Route to render the registration form
+@app.route('/register', methods=['GET'])
+def register():
+    return render_template('userRegistration.html')
+
+# Route to handle the registration form submission
+@app.route('/register', methods=['POST'])
+def register_user():
+    # Retrieve form data
+    username = request.form['username']
+    email = request.form['email']
+    password = request.form['password']
+    confirm_password = request.form['confirm_password']
+
+    # Add your registration logic here (e.g., validate form inputs, save user to database, etc.)
+    # Validate form inputs
+    if password != confirm_password:
+        return render_template('userRgistration.html', error_message='Passwords do not match')
+
+    # Create a new user instance
+    new_user = User(username=username, email=email, password=password)
+
+    # Add the new user to the database
+    
+    #carousel_images.append({'url': image_url})
+    try:
+        # Create a session
         Session = sessionmaker(bind=engine)
         session = Session()
-        session.add(new_house)
+        # Add the Contact object to the session
+        session.add(new_user)
+
+        # Commit the session to save the data to the database
         session.commit()
+
+        # Close the session
         session.close()
-        return redirect(url_for('success'))
-    return render_template('add_house.html', form=form)
+        return redirect(url_for('registration_success'))
+    except :
+        session.rollback()
+        return render_template('userRegistration.html', error_message='Username or email already exists')
+
+
+# Route to render a success page after registration
+@app.route('/registration-success', methods=['GET'])
+def registration_success():
+    return render_template('registration_success.html')
+
+
+# This route handles the form submission for user login
+@app.route('/login', methods=['GET','POST'])
+def user_login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        print(username, password)
+        # Here you would perform authentication checks, such as querying the database
+        # to verify the username and password
+        # For this example, let's just check if the username and password are both 'admin'
+
+        session_db = Session()
+        user = session_db.query(User).filter_by(username=username).first()
+        session_db.close()
+
+        if user and user.password == password:
+            # If authentication is successful, redirect to a success page
+            session['username'] = username #Session is created for the user
+            return redirect(url_for('user_account'))
+        else:
+            # If authentication fails, render the login page again with an error message
+            return render_template('userlogin.html', error='Invalid username or password')
+    return render_template('userlogin.html')
+
+# Route for the user account page
+@app.route('/user_account')
+def user_account():
+    if 'username' in session:
+        # Query the user's houses from the database
+        session_db = Session()
+        user = session_db.query(User).filter_by(username=session['username']).first()
+        user_houses = session_db.query(House).filter(House.owner_name == session['username']).all()
+        session_db.close()
+        return render_template('userAccount.html', cards=user_houses, user=user)
+    else:
+        return redirect(url_for('user_login'))
+
+@app.route('/logout')
+def user_logout():
+    session.pop('username', None)  # Remove username from session
+    return redirect(url_for('index'))
+
+# Route for adding a house (dummy route, you need to implement this)
+@app.route('/add_house', methods=['GET', 'POST'])
+def add_house():
+    if 'username' in session:
+        form = HouseForm()
+        if form.validate_on_submit():
+            new_house = House(
+                id = random.randint(1,100),
+                image=form.image.data,
+                description=form.description.data,
+                add_date=form.add_date.data,
+                owner_name=form.owner_name.data,
+                contact_number=form.contact_number.data,
+                monthly_rent=form.monthly_rent.data,
+                residence_type=form.residence_type.data,
+                num_bathrooms=form.num_bathrooms.data,
+                attached_kitchen=form.attached_kitchen.data,
+                shopping_mall=form.shopping_mall.data,
+                num_beds=form.num_beds.data,
+                transport_facility=form.transport_facility.data,
+                medical_shops=form.medical_shops.data,
+                num_food_mess=form.num_food_mess.data,
+                time_to_market=form.time_to_market.data,
+                time_to_college=form.time_to_college.data,
+                playground=form.playground.data
+            )
+            Session_db = sessionmaker(bind=engine)
+            session_db = Session()
+            session_db.add(new_house)
+            session_db.commit()
+            session_db.close()
+            return redirect(url_for('user_account'))
+        return render_template('add_house.html', form=form)
+    else:
+        return redirect(url_for('user_login'))
 @app.route('/success')
 def success():
     return render_template('thank_you.html')

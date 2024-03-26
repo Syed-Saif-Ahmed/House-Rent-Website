@@ -5,19 +5,42 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Admin Page - Queries</title>
+    <title>Admin Page</title>
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 
 <body>
-    <div class="container mt-5">
-        <h1 class="text-center mb-4">Admin Page - Queries</h1>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="/admin">Admin Page</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#queries-section">Queries</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#users-section">Users</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#carousel-section">Carousel</a>
+                </li>
+            </ul>
+        </div>
         <!-- Logout Button -->
-        <div class="text-right mb-3">
+        <div class="ml-auto">
             <button class="btn btn-danger" id="logoutBtn">Logout</button>
         </div>
+    </nav>
+    
+
+    <div id="queries-section" class="container mt-5">
+        <h1 class="text-center mb-4">Admin Page - Queries</h1>
+        
         <div class="row">
             <!-- Loop through queries and display them in cards -->
             {% for query in queries %}
@@ -66,13 +89,84 @@
         </div>
     </div>
 
+    <div id="users-section" class="container mt-5" style="display: none;">
+        <h1 class="text-center mb-4">Admin Page - Users</h1>
+        <!-- Display Users as Cards -->
+        <div class="row">
+            <!-- Loop through users and display them in cards -->
+            {% for user in users %}
+            <div class="col-md-4">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Name: {{ user.name }}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">Email: {{ user.email }}</h6>
+                        <p class="card-text">Role: {{ user.role }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div id="carousel-section" class="container mt-5" style="display: none;">
+        <h1 class="text-center mb-4">Admin Page - Carousel</h1>
+        <!-- Add Image Button -->
+        <button class="btn btn-primary mb-3" id="addImageBtn">Add Image</button>
+        <!-- Image Input Box -->
+        <div id="imageInputBox" style="display: none;">
+            <div class="form-group">
+                <label for="imageUrlInput">Image URL:</label>
+                <input type="text" class="form-control" id="imageUrlInput" placeholder="Enter image URL">
+            </div>
+            <button class="btn btn-success" id="submitImageUrlBtn">Submit</button>
+        </div>
+    </div>
+
     <script src="{{ url_for('static', filename='send_message.js') }}"></script>
 
     <!-- Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
+    <script>
+        // Script to handle navigation between sections
+        $(document).ready(function () {
+            $(".nav-link").click(function () {
+                var sectionId = $(this).attr("href");
+                $(".container").hide();
+                $(sectionId).show();
+            });
+        });
+        $(document).ready(function () {
+        // Show image input box when Add Image button is clicked
+        $("#addImageBtn").click(function () {
+            $("#imageInputBox").show();
+        });
+
+        // Send image URL to Flask server when Submit button is clicked
+        $("#submitImageUrlBtn").click(function () {
+            var imageUrl = $("#imageUrlInput").val();
+            // You can send the imageUrl to Flask server using AJAX
+            $.ajax({
+                url: "/add_image",
+                method: "POST",
+                data: { imageUrl: imageUrl },
+                success: function (response) {
+                    // Handle success response if needed
+                    console.log("Image URL sent successfully");
+                },
+                error: function (xhr, status, error) {
+                    // Handle error if needed
+                    console.error("Error occurred while sending image URL");
+                }
+            });
+            // Clear input box and hide it after submission
+            $("#imageUrlInput").val("");
+            $("#imageInputBox").hide();
+        });
+    });
+    </script>
 </body>
 
 </html>
