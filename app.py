@@ -29,14 +29,15 @@ mail = Mail(app)
 
 # MySQL configurations
 mysql_config = {
-    'host': 'localhost',  # Change this to your MySQL host
-    'user': 'root',  # Change this to your MySQL username
-    'password': 'saif1234',  # Change this to your MySQL password
-    'database': 'rents'  # Change this to your MySQL database name
+    'host': 'aws-0-ap-south-1.pooler.supabase.com',  # Change this to your MySQL host
+    'port' : '5432',
+    'user': 'postgres.innfpftleatzyutlxexe',  # Change this to your MySQL username
+    'password': 'haldiarent123',  # Change this to your MySQL password
+    'database': 'postgres'  # Change this to your MySQL database name
 }
 
 # SQLAlchemy database setup
-engine = create_engine('mysql+mysqlconnector://{user}:{password}@{host}/{database}'.format(**mysql_config))
+engine = create_engine('postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}'.format(**mysql_config))
 Base = declarative_base()
 
 
