@@ -28,7 +28,7 @@ app.config['MAIL_PASSWORD'] = 'zkukp4r93fhxzfv6'
 mail = Mail(app)
 
 # MySQL configurations
-mysql_config = {
+postgresql_config = {
     'host': 'aws-0-ap-south-1.pooler.supabase.com',  # Change this to your MySQL host
     'port' : '5432',
     'user': 'postgres.innfpftleatzyutlxexe',  # Change this to your MySQL username
@@ -37,7 +37,7 @@ mysql_config = {
 }
 
 # SQLAlchemy database setup
-engine = create_engine('postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}'.format(**mysql_config))
+engine = create_engine('postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}'.format(**postgresql_config))
 Base = declarative_base()
 
 
