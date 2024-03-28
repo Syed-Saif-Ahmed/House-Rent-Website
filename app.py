@@ -44,13 +44,27 @@ mail = Mail(app)
 
 ############################### Database-Section ############################ 
 
+# Read PostgreSQL configuration from file
+with open(r'static/postgresql_config.txt', 'r') as file:
+    postgresql_config = {}
+    for line in file:
+        key, value = line.strip().split(' = ')
+        postgresql_config[key] = value
+
+# Use the PostgreSQL configuration
+postgresql_host = postgresql_config['host']
+postgresql_port = postgresql_config['port']
+postgresql_user = postgresql_config['user']
+postgresql_password = postgresql_config['password']
+postgresql_database = postgresql_config['database']
+
 # Postgresql configurations
 postgresql_config = {
-    'host': 'aws-0-ap-south-1.pooler.supabase.com',  # Change this to your MySQL host
-    'port' : '5432',
-    'user': 'postgres.innfpftleatzyutlxexe',  # Change this to your MySQL username
-    'password': 'haldiarent123',  # Change this to your MySQL password
-    'database': 'postgres'  # Change this to your MySQL database name
+    'host': postgresql_host,  # Change this to your MySQL host
+    'port' : postgresql_port,
+    'user': postgresql_user,  # Change this to your MySQL username
+    'password': postgresql_password,  # Change this to your MySQL password
+    'database': postgresql_database  # Change this to your MySQL database name
 }
 
 # SQLAlchemy database setup
