@@ -28,15 +28,6 @@ app.config['MAIL_PASSWORD'] = 'zkukp4r93fhxzfv6'
 mail = Mail(app)
 
 
-# mysql_config = {
-#     'host': 'localhost',  # Change this to your MySQL host
-#     'user': 'root',  # Change this to your MySQL username
-#     'password': 'saif1234',  # Change this to your MySQL password
-#     'database': 'rents'  # Change this to your MySQL database name
-# }
-
-# # SQLAlchemy database setup
-# engine = create_engine('mysql+mysqlconnector://{user}:{password}@{host}/{database}'.format(**mysql_config))
 
 # Postgresql configurations
 postgresql_config = {
