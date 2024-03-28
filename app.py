@@ -27,7 +27,18 @@ app.config['MAIL_USERNAME'] = 'rentechspace@fastmail.com'
 app.config['MAIL_PASSWORD'] = 'zkukp4r93fhxzfv6'
 mail = Mail(app)
 
-# MySQL configurations
+
+# mysql_config = {
+#     'host': 'localhost',  # Change this to your MySQL host
+#     'user': 'root',  # Change this to your MySQL username
+#     'password': 'saif1234',  # Change this to your MySQL password
+#     'database': 'rents'  # Change this to your MySQL database name
+# }
+
+# # SQLAlchemy database setup
+# engine = create_engine('mysql+mysqlconnector://{user}:{password}@{host}/{database}'.format(**mysql_config))
+
+# Postgresql configurations
 postgresql_config = {
     'host': 'aws-0-ap-south-1.pooler.supabase.com',  # Change this to your MySQL host
     'port' : '5432',
@@ -163,6 +174,8 @@ def houseload():
             }
             for house in houses
         ]
+        if card_data:
+            card_data.clear()
         card_data.extend(formatted_data)
     except Exception as e:
         print(f"Error extracting data from the database: {e}")
@@ -437,22 +450,22 @@ def add_house():
                 monthly_rent=form.monthly_rent.data,
                 residence_type=form.residence_type.data,
                 num_bathrooms=form.num_bathrooms.data,
-                attached_kitchen=form.attached_kitchen.data,
-                shopping_mall=form.shopping_mall.data,
+                attached_kitchen=int(form.attached_kitchen.data),
+                shopping_mall=int(form.shopping_mall.data),
                 num_beds=form.num_beds.data,
-                transport_facility=form.transport_facility.data,
-                medical_shops=form.medical_shops.data,
+                transport_facility=int(form.transport_facility.data),
+                medical_shops=int(form.medical_shops.data),
                 num_food_mess=form.num_food_mess.data,
                 time_to_market=form.time_to_market.data,
                 time_to_college=form.time_to_college.data,
-                playground=form.playground.data
+                playground=int(form.playground.data)
             )
             Session_db = sessionmaker(bind=engine)
             session_db = Session()
             session_db.add(new_house)
             session_db.commit()
             session_db.close()
-            return redirect(url_for('user_account'))
+            return redirect(url_for('user_account')), houseload()
         return render_template('add_house.html', form=form)
     else:
         return redirect(url_for('user_login'))
