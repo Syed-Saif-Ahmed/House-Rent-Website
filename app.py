@@ -1,3 +1,5 @@
+# Necessary Dependencies
+
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session
 from sqlalchemy import create_engine, Column, String, Integer, Text, Date
 from sqlalchemy.ext.declarative import declarative_base
@@ -9,7 +11,11 @@ from wtforms import StringField, IntegerField, BooleanField, TextAreaField, Sele
 from wtforms.validators import DataRequired, NumberRange, Length
 import random
 
+# Flask App creation 
 app = Flask(__name__)
+
+
+############################## Secret key section for session ##################
 
 # Open the file in read mode ('r')
 with open(r'static/secretkey.txt', 'r') as file:
@@ -18,16 +24,25 @@ with open(r'static/secretkey.txt', 'r') as file:
 
     app.secret_key = content # Add A secret Key Here
 
+############################## Email Configursection #########################
+
+# Read mail configuration from file
+with open(r'static/mail_config.txt', 'r') as file:
+    mail_config = {}
+    for line in file:
+        key, value = line.strip().split(' = ')
+        mail_config[key] = value
+
 # Configure Flask-Mail
-app.config['MAIL_SERVER'] = 'smtp.fastmail.com'
-app.config['MAIL_PORT'] = '465'  # or your mail server port
-app.config['MAIL_USE_TLS'] = False
-app.config['MAIL_USE_SSL'] = True
-app.config['MAIL_USERNAME'] = 'rentechspace@fastmail.com'
-app.config['MAIL_PASSWORD'] = 'zkukp4r93fhxzfv6'
+app.config['MAIL_SERVER'] = mail_config['MAIL_SERVER']
+app.config['MAIL_PORT'] = mail_config['MAIL_PORT']
+app.config['MAIL_USE_TLS'] = mail_config['MAIL_USE_TLS']
+app.config['MAIL_USE_SSL'] = mail_config['MAIL_USE_SSL']
+app.config['MAIL_USERNAME'] = mail_config['MAIL_USERNAME']
+app.config['MAIL_PASSWORD'] = mail_config['MAIL_PASSWORD']
 mail = Mail(app)
 
-
+############################### Database-Section ############################ 
 
 # Postgresql configurations
 postgresql_config = {
@@ -98,6 +113,7 @@ class House(Base):
     time_to_market = Column(Integer) # Time taken to reach market on foot 5, 10, 15, 20, ... minutes
     time_to_college = Column(Integer) # Time taken to reach College on foot 5, 10, 15, 20, ... minutes
     playground = Column(Integer)# It is yes or no answer so we will save 1 or 0
+    email = Column(String(100)) # Same the email here
 
     def __repr__(self):
         return f'<House {self.id}>'
@@ -115,11 +131,10 @@ Base.metadata.create_all(engine)
 # Create a sessionmaker
 Session = sessionmaker(bind=engine)
 
-carousel_images = [
-    'https://is1-2.housingcdn.com/01c16c28/169120c556b55c17c2b73b9a755f5e74/v0/fs/3_bhk_independent_house-for-rent-haldia_riverside_estates_limited-Purba+Medinipur-bedroom.jpg',
-    'https://cf.bstatic.com/xdata/images/hotel/max1024x768/496372177.jpg?k=cf4427eaf1ea929a679d29f61b892eef2e3e55ed5ff8fed3cd1ef6ca0c6bb90b&o=&hp=1',
-    'https://cf.bstatic.com/xdata/images/hotel/max1024x768/472220329.jpg?k=f527727b1826834f9c66ae9bd3176ea7a67ca9cd7a32aa1c944c924c3a387928&o=&hp=1'
-]
+
+
+################################ Loading The Main View of the page ################################
+carousel_images = []
 def loadcarousel():
     try:
         # Query all rows from the CarouselImage table
@@ -128,6 +143,8 @@ def loadcarousel():
         session_db.close()
         carousel = queries
         # Convert the query result to a list of dictionaries
+        if carousel_images:
+            carousel_images.clear()
         carousel_data = [image.url for image in carousel]
         carousel_images.extend(carousel_data)
     except Exception as e:
@@ -173,6 +190,10 @@ def houseload():
 
 houseload()
 
+
+
+#################################### Replace #######################################
+
 class HouseForm(FlaskForm):
     image = StringField('Image Link', validators=[DataRequired()])
     description = TextAreaField('Description', validators=[DataRequired(), Length(max=255)])
@@ -192,6 +213,25 @@ class HouseForm(FlaskForm):
     time_to_college = IntegerField('Time to Reach College (minutes)', validators=[DataRequired(), NumberRange(min=0)])
     playground = BooleanField('Playground Nearby')
 
+
+############################### Main Page Section #############################
+    
+@app.route('/thank_you_page')
+def thank_you_page():
+    return render_template('thank_you.html')
+
+@app.route('/')
+def index():
+    return render_template('index.html', cards=card_data, carousel_images=carousel_images)
+
+@app.route('/contact')
+def contact():
+    return render_template('contact.html')
+
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
 @app.route('/submit_contact_form', methods=['POST'])
 def submit_contact_form():
     if request.method == 'POST':
@@ -205,17 +245,17 @@ def submit_contact_form():
             contact = Contact(name=name, email=email, message=message)
 
             # Create a session
-            Session = sessionmaker(bind=engine)
-            session = Session()
+            Session_db = sessionmaker(bind=engine)
+            session_db = Session_db()
 
             # Add the Contact object to the session
-            session.add(contact)
+            session_db.add(contact)
 
             # Commit the session to save the data to the database
-            session.commit()
+            session_db.commit()
 
             # Close the session
-            session.close()
+            session_db.close()
 
             # Optionally, you can redirect the user to a thank you page
             return render_template('thank_you.html')
@@ -226,6 +266,8 @@ def submit_contact_form():
             return render_template('contact.html', error_message="Please fill out all the fields.")
 
 
+##################################### Admin-Section #######################################
+
 # Route for the admin page
 @app.route('/admin')
 def admin_page():
@@ -234,8 +276,9 @@ def admin_page():
     if 'username' in session:
         session_db = Session()
         queries = session_db.query(Contact).all()
+        users = session_db.query(User).all()
         session_db.close()
-        return render_template('admin.html', queries=queries)
+        return render_template('admin.html', queries=queries, users = users, carousel_images = carousel_images)
     else:
         return redirect(url_for('admin_login'))
 
@@ -298,17 +341,17 @@ def add_image():
             input = CarouselImage(url=image_url)
 
             # Create a session
-            Session = sessionmaker(bind=engine)
-            session = Session()
+            Session_db = sessionmaker(bind=engine)
+            session_db = Session_db()
 
             # Add the Contact object to the session
-            session.add(input)
+            session_db.add(input)
 
             # Commit the session to save the data to the database
-            session.commit()
+            session_db.commit()
 
             # Close the session
-            session.close()
+            session_db.close()
             #carousel_images.append({'url': image_url})
 
             return jsonify({'message': 'Image added successfully'}), 200, loadcarousel()
@@ -316,22 +359,11 @@ def add_image():
             return jsonify({'error': 'No image URL provided'}), 400
     else:
         return redirect(url_for('admin_login'))
+    
+######################################## Admin-Section END #####################################
 
-@app.route('/thank_you_page')
-def thank_you_page():
-    return render_template('thank_you.html')
 
-@app.route('/')
-def index():
-    return render_template('index.html', cards=card_data, carousel_images=carousel_images)
-
-@app.route('/contact')
-def contact():
-    return render_template('contact.html')
-
-@app.route('/about')
-def about():
-    return render_template('about.html')
+######################################## User-Section #######################################
 
 # Route to render the registration form
 @app.route('/register', methods=['GET'])
@@ -360,16 +392,16 @@ def register_user():
     #carousel_images.append({'url': image_url})
     try:
         # Create a session
-        Session = sessionmaker(bind=engine)
-        session = Session()
+        Session_db = sessionmaker(bind=engine)
+        session_db = Session_db()
         # Add the Contact object to the session
-        session.add(new_user)
+        session_db.add(new_user)
 
         # Commit the session to save the data to the database
-        session.commit()
+        session_db.commit()
 
         # Close the session
-        session.close()
+        session_db.close()
         return redirect(url_for('registration_success'))
     except :
         session.rollback()
@@ -386,21 +418,21 @@ def registration_success():
 @app.route('/login', methods=['GET','POST'])
 def user_login():
     if request.method == 'POST':
-        username = request.form['username']
+        email = request.form['email']
         password = request.form['password']
 
-        print(username, password)
+        print(email, password)
         # Here you would perform authentication checks, such as querying the database
         # to verify the username and password
         # For this example, let's just check if the username and password are both 'admin'
 
         session_db = Session()
-        user = session_db.query(User).filter_by(username=username).first()
+        user = session_db.query(User).filter_by(email=email).first()
         session_db.close()
 
         if user and user.password == password:
             # If authentication is successful, redirect to a success page
-            session['username'] = username #Session is created for the user
+            session['email'] = email #Session is created for the user
             return redirect(url_for('user_account'))
         else:
             # If authentication fails, render the login page again with an error message
@@ -410,11 +442,11 @@ def user_login():
 # Route for the user account page
 @app.route('/user_account')
 def user_account():
-    if 'username' in session:
+    if 'email' in session:
         # Query the user's houses from the database
         session_db = Session()
-        user = session_db.query(User).filter_by(username=session['username']).first()
-        user_houses = session_db.query(House).filter(House.owner_name == session['username']).all()
+        user = session_db.query(User).filter_by(email=session['email']).first()
+        user_houses = session_db.query(House).filter(House.email == session['email']).all()
         session_db.close()
         return render_template('userAccount.html', cards=user_houses, user=user)
     else:
@@ -422,13 +454,13 @@ def user_account():
 
 @app.route('/logout')
 def user_logout():
-    session.pop('username', None)  # Remove username from session
+    session.pop('email', None)  # Remove username from session
     return redirect(url_for('index'))
 
 # Route for adding a house (dummy route, you need to implement this)
 @app.route('/add_house', methods=['GET', 'POST'])
 def add_house():
-    if 'username' in session:
+    if 'email' in session:
         form = HouseForm()
         if form.validate_on_submit():
             new_house = House(
@@ -449,7 +481,8 @@ def add_house():
                 num_food_mess=form.num_food_mess.data,
                 time_to_market=form.time_to_market.data,
                 time_to_college=form.time_to_college.data,
-                playground=int(form.playground.data)
+                playground=int(form.playground.data),
+                email=session['email']
             )
             Session_db = sessionmaker(bind=engine)
             session_db = Session()
@@ -463,6 +496,8 @@ def add_house():
 @app.route('/success')
 def success():
     return render_template('thank_you.html')
+
+######################################## User-Section Ends ####################################
 
 
 if __name__ == '__main__':

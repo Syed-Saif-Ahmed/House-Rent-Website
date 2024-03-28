@@ -22,8 +22,8 @@
                     <div class="card-body">
                         <form id="loginForm" action="login" method="POST">
                             <div class="form-group">
-                                <label for="username">Username</label>
-                                <input type="text" class="form-control" id="username" name="username" required>
+                                <label for="email">Email</label>
+                                <input type="text" class="form-control" id="email" name="email" required>
                             </div>
                             <div class="form-group">
                                 <label for="password">Password</label>
@@ -46,12 +46,12 @@
     <!-- Custom JavaScript -->
     <script>
         document.getElementById('loginForm').addEventListener('submit', function(event) {
-            var username = document.getElementById('username').value;
+            var email = document.getElementById('email').value;
             var password = document.getElementById('password').value;
 
-            if (!username || !password) {
+            if (!email || !password) {
                 event.preventDefault(); // Prevent form submission
-                document.getElementById('errorMessage').innerText = 'Please enter both username and password.';
+                document.getElementById('errorMessage').innerText = 'Please enter both email and password.';
             }
         });
     </script>
