@@ -513,5 +513,13 @@ def success():
 
 ######################################## User-Section Ends ####################################
 
+# Route to handle 404 error for favicon.ico requests
+@app.errorhandler(404)
+def handle_404_error(e):
+    if request.path.endswith('favicon.ico'):
+        return '', 204  # Return empty response for favicon.ico requests
+    else:
+        return render_template('404.html'), 404  # Return a custom error page for other 404 errors
+
 if __name__ == '__main__':
     app.run(debug=True)
