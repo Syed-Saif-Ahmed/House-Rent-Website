@@ -1,6 +1,6 @@
 # Necessary Dependencies
 
-from flask import Flask, render_template, request, redirect, url_for, jsonify, session
+from flask import Flask, render_template, request, redirect, url_for, jsonify, session, abort
 from sqlalchemy import create_engine, Column, String, Integer, Text, Date
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -513,13 +513,11 @@ def success():
 
 ######################################## User-Section Ends ####################################
 
-# Route to handle 404 error for favicon.ico requests
-@app.errorhandler(404)
-def handle_404_error(e):
-    if request.path.endswith('favicon.ico'):
-        return '', 204  # Return empty response for favicon.ico requests
-    else:
-        return render_template('404.html'), 404  # Return a custom error page for other 404 errors
+# Route to handle requests for /favicon.ico
+@app.route('/favicon.ico')
+def prevent_vercel_access():
+    # Return a 404 Not Found status code
+    abort(404)
 
 if __name__ == '__main__':
     app.run(debug=True)
